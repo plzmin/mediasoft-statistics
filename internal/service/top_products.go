@@ -67,7 +67,7 @@ func (s *Service) TopProducts(ctx context.Context,
 		return result[i].Count > result[j].Count
 	})
 
-	if cap(result) > 3 {
+	if cap(result) >= 3 {
 		return &statistics.TopProductsResponse{Result: result[:3]}, nil
 	}
 
