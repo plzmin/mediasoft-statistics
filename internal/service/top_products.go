@@ -21,11 +21,11 @@ func (s *Service) TopProducts(ctx context.Context,
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	var result []*statistics.Product
+	var list []*statistics.Product
 	for _, product := range products {
 		for _, p := range restaurantProducts.Result {
 			if product.ProductUuid.String() == p.Uuid {
-				result = append(result, &statistics.Product{
+				list = append(list, &statistics.Product{
 					Uuid:        p.Uuid,
 					Name:        p.Name,
 					Count:       product.Count,
@@ -37,14 +37,29 @@ func (s *Service) TopProducts(ctx context.Context,
 
 	topProducts := make(map[string]int64)
 	if req.ProductType != nil {
-		for _, el := range result {
+		for _, el := range list {
 			if el.ProductType == *req.ProductType {
 				topProducts[el.Uuid] += el.Count
 			}
 		}
 	} else {
-		for _, el := range result {
+		for _, el := range list {
 			topProducts[el.Uuid] += el.Count
+		}
+	}
+
+	var result []*statistics.Product
+	for productUuid, count := range topProducts {
+		for _, product := range list {
+			if productUuid == product.Uuid {
+				result = append(result, &statistics.Product{
+					Uuid:        productUuid,
+					Name:        product.Name,
+					Count:       count,
+					ProductType: product.ProductType,
+				})
+				break
+			}
 		}
 	}
 
@@ -52,5 +67,9 @@ func (s *Service) TopProducts(ctx context.Context,
 		return result[i].Count > result[j].Count
 	})
 
-	return &statistics.TopProductsResponse{Result: result[:3]}, nil
+	if cap(result) > 3 {
+		return &statistics.TopProductsResponse{Result: result[:3]}, nil
+	}
+
+	return &statistics.TopProductsResponse{Result: result}, nil
 }

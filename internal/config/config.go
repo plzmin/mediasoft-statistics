@@ -2,12 +2,12 @@ package config
 
 type Config struct {
 	HTTP struct {
-		IP   string `env:"HTTP-IP"`
-		Port int    `env:"HTTP-PORT"`
+		IP   string `env:"HTTP_IP"`
+		Port int    `env:"HTTP_PORT"`
 	}
 	GRPC struct {
-		IP   string `env:"HTTP-IP"`
-		Port int    `env:"HTTP-PORT"`
+		IP   string `env:"GRPC_IP"`
+		Port int    `env:"GRPC_PORT"`
 	}
 
 	PostgresSQL struct {
